@@ -32,6 +32,8 @@ func (q _queryOrderDetailStep) Exec(input any, option *services.ReportOption) (a
 
 	var response []map[string]any
 	res, err := http.Get(q.url + "?ids=" + strings.Join(ids, ","))
+	// TODO: batch process (redis)
+	// handle batch fail
 
 	body, err := ioutil.ReadAll(res.Body)
 	err = json.Unmarshal(body, &response)
