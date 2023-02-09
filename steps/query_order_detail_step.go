@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"reflect"
 	"strconv"
 	"strings"
 	"subscription-report/models"
@@ -22,11 +21,10 @@ func NewQueryOrderDetailStep(url string, client *http.Client) services.Step {
 }
 
 func (q _queryOrderDetailStep) Exec(input any, option *services.ReportOption) (any, *services.ReportOption) {
-	rt := reflect.TypeOf(input)
-	if rt.String() != "*[]models.Orders" {
-		fmt.Println("error")
+	orders, isOrders := input.(*[]models.Orders)
+	if !isOrders {
+		panic("input error type")
 	}
-	orders, _ := input.(*[]models.Orders)
 	ids := make([]string, 0)
 	for _, order := range *orders {
 		ids = append(ids, strconv.Itoa(int(order.CustomerNumber)))
@@ -52,5 +50,5 @@ func (q _queryOrderDetailStep) Exec(input any, option *services.ReportOption) (a
 	// 	})
 	// }
 
-	return response, option
+	return &response, option
 }

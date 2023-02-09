@@ -38,9 +38,8 @@ func main() {
 	reportSteps := []services.Step{}
 	queryLatestChangeStep := steps.NewQueryLatestChangeStep(db)
 	queryOrderDetailStep := steps.NewQueryOrderDetailStep(os.Getenv("API_URL"), httpClient)
-	reportSteps = append(reportSteps, queryLatestChangeStep, queryOrderDetailStep)
+	generateReportStep := steps.NewGenrateReportStep()
+	reportSteps = append(reportSteps, queryLatestChangeStep, queryOrderDetailStep, generateReportStep)
 	reportService := services.NewReportService(reportSteps)
-	report := reportService.Exec(fromRange, toRange)
-
-	fmt.Println(report)
+	reportService.Exec(fromRange, toRange)
 }
