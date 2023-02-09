@@ -1,0 +1,35 @@
+package services
+
+type _reportService struct {
+	steps []Step
+}
+
+type ReportService interface {
+	Exec(from string, to string) any
+}
+
+type Step interface {
+	Exec(input any, option *ReportOption) (any, *ReportOption)
+}
+
+type ReportOption struct {
+	From string
+	To   string
+}
+
+func NewReportService(
+	steps []Step) ReportService {
+	return &_reportService{
+		steps: steps,
+	}
+}
+
+func (r *_reportService) Exec(from string, to string) any {
+	var report any
+	saveOption := &ReportOption{From: from, To: to}
+	for _, step := range r.steps {
+		output, option := step.Exec(report, saveOption)
+		report, saveOption = output, option
+	}
+	return report
+}
