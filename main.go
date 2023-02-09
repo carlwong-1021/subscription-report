@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -32,9 +33,11 @@ func main() {
 		panic(err.Error())
 	}
 
+	httpClient := &http.Client{}
+
 	reportSteps := []services.Step{}
 	queryLatestChangeStep := steps.NewQueryLatestChangeStep(db)
-	queryOrderDetailStep := steps.NewQueryOrderDetailStep()
+	queryOrderDetailStep := steps.NewQueryOrderDetailStep(os.Getenv("API_URL"), httpClient)
 	reportSteps = append(reportSteps, queryLatestChangeStep, queryOrderDetailStep)
 	reportService := services.NewReportService(reportSteps)
 	report := reportService.Exec(fromRange, toRange)

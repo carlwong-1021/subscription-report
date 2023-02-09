@@ -23,5 +23,5 @@ func (q _queryLatestChangeStep) Exec(input any, option *services.ReportOption) (
 
 	var orders []models.Orders
 	q.db.Debug().Where("orderDate >= ? and orderDate <= ?", from, to).Order("orderDate").Find(&orders)
-	return orders, option
+	return &orders, option
 }

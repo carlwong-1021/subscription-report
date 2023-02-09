@@ -28,8 +28,7 @@ func (r *_reportService) Exec(from string, to string) any {
 	var report any
 	saveOption := &ReportOption{From: from, To: to}
 	for _, step := range r.steps {
-		output, option := step.Exec(report, saveOption)
-		report, saveOption = output, option
+		report, saveOption = step.Exec(report, saveOption)
 	}
 	return report
 }
