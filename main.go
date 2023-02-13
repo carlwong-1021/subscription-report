@@ -6,13 +6,15 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 
 	"subscription-report/services"
 	"subscription-report/steps"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func main() {
@@ -28,10 +30,13 @@ func main() {
 
 	dsn := fmt.Sprintf("%s:%s@%s(%s)/%s?charset=utf8&parseTime=True&loc=Local", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_PROTO"), os.Getenv("MYSQL_HOST"), os.Getenv("MYSQL_DATABASE"))
 
-	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err := sqlx.Open("mysql", dsn)
 	if err != nil {
-		panic(err.Error())
+		panic(err)
 	}
+	db.SetConnMaxLifetime(time.Minute * 3)
+	db.SetMaxOpenConns(10)
+	db.SetMaxIdleConns(10)
 
 	httpClient := &http.Client{}
 

@@ -1,18 +1,19 @@
 package steps
 
 import (
+	"fmt"
 	"subscription-report/models"
 	"subscription-report/services"
 	"time"
 
-	"gorm.io/gorm"
+	"github.com/jmoiron/sqlx"
 )
 
 type _queryLatestChangeStep struct {
-	db *gorm.DB
+	db *sqlx.DB
 }
 
-func NewQueryLatestChangeStep(db *gorm.DB) services.Step {
+func NewQueryLatestChangeStep(db *sqlx.DB) services.Step {
 	return &_queryLatestChangeStep{db: db}
 }
 
@@ -22,6 +23,14 @@ func (q _queryLatestChangeStep) Exec(input any, option *services.ReportOption) (
 	to, _ := time.Parse(layout, option.To)
 
 	var orders []models.Orders
-	q.db.Debug().Where("orderDate >= ? and orderDate <= ?", from, to).Order("orderDate").Find(&orders)
+	rows, err := q.db.Queryx("SELECT orderNumber, orderDate, status, customerNumber FROM orders WHERE orderDate >= ? AND orderDate <= ? ORDER BY orderNumber", from, to)
+	if err != nil {
+		fmt.Println(err)
+	}
+	for rows.Next() {
+		var order models.Orders
+		err = rows.StructScan(&order)
+		orders = append(orders, order)
+	}
 	return &orders, option
 }

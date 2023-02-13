@@ -6,11 +6,9 @@ import (
 	"subscription-report/services"
 
 	"github.com/xuri/excelize/v2"
-	"gorm.io/gorm"
 )
 
 type _genrateReportStep struct {
-	db *gorm.DB
 }
 
 func NewGenrateReportStep() services.Step {
