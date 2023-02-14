@@ -13,8 +13,9 @@ type Step interface {
 }
 
 type ReportOption struct {
-	From string
-	To   string
+	From      string
+	To        string
+	BatchSize int
 }
 
 func NewReportService(
@@ -26,7 +27,7 @@ func NewReportService(
 
 func (r *_reportService) Exec(from string, to string) any {
 	var report any
-	saveOption := &ReportOption{From: from, To: to}
+	saveOption := &ReportOption{From: from, To: to, BatchSize: 5}
 	for _, step := range r.steps {
 		report, saveOption = step.Exec(report, saveOption)
 	}

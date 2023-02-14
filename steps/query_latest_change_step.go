@@ -32,5 +32,5 @@ func (q _queryLatestChangeStep) Exec(input any, option *services.ReportOption) (
 		err = rows.StructScan(&order)
 		orders = append(orders, order)
 	}
-	return &orders, option
+	return orders, option
 }
