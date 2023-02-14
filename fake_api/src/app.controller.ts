@@ -7,9 +7,9 @@ export class AppController {
 
   @Get('/')
   async getCustomer(
-    @Query('ids', new ParseArrayPipe({ items: Number, separator: ',' }))
-    ids: number[],
+    @Query('ids', new ParseArrayPipe({ items: String, separator: ',' }))
+    ids: string[],
   ) {
-    return this.appService.findByCustomerIds(ids);
+    return this.appService.findByIds(ids);
   }
 }

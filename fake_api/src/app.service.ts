@@ -1,21 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
-import { Customer } from './entities/customer';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Movie, MovieDocument } from './entities/movies';
 
 @Injectable()
 export class AppService {
-  constructor(
-    @InjectRepository(Customer) private customerRepo: Repository<Customer>,
-  ) {}
+  constructor(@InjectModel(Movie.name) private model: Model<MovieDocument>) {}
 
-  async findByCustomerIds(ids: number[]): Promise<Customer[]> {
-    const customers = await this.customerRepo.find({
-      where: {
-        customerNumber: In(ids),
-      },
-    });
-    console.log(customers);
-    return customers;
+  async findByIds(ids: string[]): Promise<Movie[]> {
+    return this.model.find({ _id: { $in: ids } });
   }
 }

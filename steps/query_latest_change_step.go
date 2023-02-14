@@ -1,36 +1,41 @@
 package steps
 
 import (
+	"context"
 	"fmt"
 	"subscription-report/models"
 	"subscription-report/services"
-	"time"
 
-	"github.com/jmoiron/sqlx"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type _queryLatestChangeStep struct {
-	db *sqlx.DB
+	db *mongo.Database
 }
 
-func NewQueryLatestChangeStep(db *sqlx.DB) services.Step {
+func NewQueryLatestChangeStep(db *mongo.Database) services.Step {
 	return &_queryLatestChangeStep{db: db}
 }
 
 func (q _queryLatestChangeStep) Exec(input any, option *services.ReportOption) (any, *services.ReportOption) {
-	layout := "2006-01-02"
-	from, _ := time.Parse(layout, option.From)
-	to, _ := time.Parse(layout, option.To)
+	// layout := "2006-01-02"
+	// from, _ := time.Parse(layout, option.From)
+	// to, _ := time.Parse(layout, option.To)
 
-	var orders []models.Orders
-	rows, err := q.db.Queryx("SELECT orderNumber, orderDate, status, customerNumber FROM orders WHERE orderDate >= ? AND orderDate <= ? ORDER BY orderNumber", from, to)
+	collection := q.db.Collection("comments")
+	filter := bson.D{{"name", "John Bishop"}}
+	cursor, err := collection.Find(context.TODO(), filter)
 	if err != nil {
 		fmt.Println(err)
 	}
-	for rows.Next() {
-		var order models.Orders
-		err = rows.StructScan(&order)
-		orders = append(orders, order)
+
+	var comments []models.Comment
+	if err = cursor.All(context.TODO(), &comments); err != nil {
+		panic(err)
 	}
-	return orders, option
+	for _, comment := range comments {
+		cursor.Decode(&comment)
+	}
+	return comments, option
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -8,8 +9,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/jmoiron/sqlx"
 	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"subscription-report/services"
 	"subscription-report/steps"
@@ -28,20 +30,20 @@ func main() {
 	flag.StringVar(&toRange, "e", "", "to range")
 	flag.Parse()
 
-	dsn := fmt.Sprintf("%s:%s@%s(%s)/%s?charset=utf8&parseTime=True&loc=Local", os.Getenv("MYSQL_USER"), os.Getenv("MYSQL_PASSWORD"), os.Getenv("MYSQL_PROTO"), os.Getenv("MYSQL_HOST"), os.Getenv("MYSQL_DATABASE"))
-
-	db, err := sqlx.Open("mysql", dsn)
+	uri := fmt.Sprintf("mongodb+srv://%s:%s@%s", os.Getenv("MONGO_USER"), os.Getenv("MONGO_PASSWORD"), os.Getenv("MONGO_HOST"))
+	fmt.Println("Start MongoDB connection: ", uri)
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err != nil {
 		panic(err)
 	}
-	db.SetConnMaxLifetime(time.Minute * 3)
-	db.SetMaxOpenConns(10)
-	db.SetMaxIdleConns(10)
+	database := client.Database(os.Getenv("MONGO_DATABASE"))
 
 	httpClient := &http.Client{}
 
 	reportSteps := []services.Step{}
-	queryLatestChangeStep := steps.NewQueryLatestChangeStep(db)
+	queryLatestChangeStep := steps.NewQueryLatestChangeStep(database)
 	queryOrderDetailStep := steps.NewQueryOrderDetailStep(os.Getenv("API_URL"), httpClient)
 	generateReportStep := steps.NewGenrateReportStep()
 	reportSteps = append(reportSteps, queryLatestChangeStep, queryOrderDetailStep, generateReportStep)

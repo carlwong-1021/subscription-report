@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 	"strings"
 	"subscription-report/models"
 	"subscription-report/services"
@@ -21,13 +20,13 @@ func NewQueryOrderDetailStep(url string, client *http.Client) services.Step {
 }
 
 func (q _queryOrderDetailStep) Exec(input any, option *services.ReportOption) (any, *services.ReportOption) {
-	orders, isOrders := input.([]models.Orders)
-	if !isOrders {
-		panic("input error type")
+	comments, isComments := input.([]models.Comment)
+	if !isComments {
+		panic("wrong input type")
 	}
 	ids := make([]string, 0)
-	for _, order := range orders {
-		ids = append(ids, strconv.Itoa(int(order.CustomerNumber)))
+	for _, comment := range comments {
+		ids = append(ids, comment.MovieId.String())
 	}
 
 	var result []map[string]any
