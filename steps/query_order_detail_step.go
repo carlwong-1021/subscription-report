@@ -26,7 +26,7 @@ func (q _queryOrderDetailStep) Exec(input any, option *services.ReportOption) (a
 	}
 	ids := make([]string, 0)
 	for _, comment := range comments {
-		ids = append(ids, comment.MovieId.String())
+		ids = append(ids, comment.MovieId.Hex())
 	}
 
 	var result []map[string]any
@@ -45,9 +45,7 @@ func (q _queryOrderDetailStep) Exec(input any, option *services.ReportOption) (a
 		result = append(result, response...)
 	}
 
-	// TODO: batch process (redis)
-	// handle batch fail
-	return &result, option
+	return result, option
 }
 
 func (q _queryOrderDetailStep) fetchData(ids []string) ([]map[string]any, error) {

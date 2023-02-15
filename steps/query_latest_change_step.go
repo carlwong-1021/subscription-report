@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"subscription-report/models"
 	"subscription-report/services"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -19,12 +20,12 @@ func NewQueryLatestChangeStep(db *mongo.Database) services.Step {
 }
 
 func (q _queryLatestChangeStep) Exec(input any, option *services.ReportOption) (any, *services.ReportOption) {
-	// layout := "2006-01-02"
-	// from, _ := time.Parse(layout, option.From)
-	// to, _ := time.Parse(layout, option.To)
+	layout := "2006-01-02"
+	from, _ := time.Parse(layout, option.From)
+	to, _ := time.Parse(layout, option.To)
 
 	collection := q.db.Collection("comments")
-	filter := bson.D{{"name", "John Bishop"}}
+	filter := bson.M{"date": bson.M{"$gte": from, "$lte": to}}
 	cursor, err := collection.Find(context.TODO(), filter)
 	if err != nil {
 		fmt.Println(err)

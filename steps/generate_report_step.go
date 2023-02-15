@@ -16,9 +16,9 @@ func NewGenrateReportStep() services.Step {
 }
 
 func (q _genrateReportStep) Exec(input any, option *services.ReportOption) (any, *services.ReportOption) {
-	report, isReport := input.(*[]map[string]any)
+	report, isReport := input.([]map[string]any)
 	if !isReport {
-		panic("input error type")
+		panic("error input type")
 	}
 
 	f := excelize.NewFile()
@@ -30,11 +30,11 @@ func (q _genrateReportStep) Exec(input any, option *services.ReportOption) (any,
 	index, _ := f.NewSheet("Sheet1")
 	f.SetActiveSheet(index)
 
-	f.SetCellValue("Sheet1", "A1", "Customer Number")
-	f.SetCellValue("Sheet1", "B1", "Customer Name")
-	for i, item := range *report {
-		f.SetCellValue("Sheet1", "A"+strconv.Itoa(i+2), item["customerNumber"])
-		f.SetCellValue("Sheet1", "B"+strconv.Itoa(i+2), item["customerName"])
+	f.SetCellValue("Sheet1", "A1", "Movie Title")
+	f.SetCellValue("Sheet1", "B1", "Movie Year")
+	for i, item := range report {
+		f.SetCellValue("Sheet1", "A"+strconv.Itoa(i+2), item["title"])
+		f.SetCellValue("Sheet1", "B"+strconv.Itoa(i+2), item["year"])
 	}
 
 	if err := f.SaveAs("demo.xlsx"); err != nil {
