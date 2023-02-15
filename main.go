@@ -13,6 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
+	"subscription-report/repositories"
 	"subscription-report/services"
 	"subscription-report/steps"
 
@@ -31,19 +32,19 @@ func main() {
 	flag.Parse()
 
 	uri := fmt.Sprintf("mongodb+srv://%s:%s@%s", os.Getenv("MONGO_USER"), os.Getenv("MONGO_PASSWORD"), os.Getenv("MONGO_HOST"))
-	fmt.Println("Start MongoDB connection: ", uri)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri))
 	if err != nil {
 		panic(err)
 	}
-	database := client.Database(os.Getenv("MONGO_DATABASE"))
+	db := client.Database(os.Getenv("MONGO_DATABASE"))
+	commentRepo := repositories.NewCommentRepository(db)
 
 	httpClient := &http.Client{}
 
 	reportSteps := []services.Step{}
-	queryLatestChangeStep := steps.NewQueryLatestChangeStep(database)
+	queryLatestChangeStep := steps.NewQueryLatestChangeStep(commentRepo)
 	queryOrderDetailStep := steps.NewQueryOrderDetailStep(os.Getenv("API_URL"), httpClient)
 	generateReportStep := steps.NewGenrateReportStep()
 	reportSteps = append(reportSteps, queryLatestChangeStep, queryOrderDetailStep, generateReportStep)
