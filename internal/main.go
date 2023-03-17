@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"context"
@@ -13,14 +13,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"subscription-report/repositories"
-	"subscription-report/services"
-	"subscription-report/steps"
+	"subscription-report/internal/repositories"
+	"subscription-report/internal/services"
+	"subscription-report/internal/steps"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func main() {
+func Exec() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")

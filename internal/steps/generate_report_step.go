@@ -3,7 +3,7 @@ package steps
 import (
 	"fmt"
 	"strconv"
-	"subscription-report/services"
+	"subscription-report/internal/services"
 
 	"github.com/xuri/excelize/v2"
 )

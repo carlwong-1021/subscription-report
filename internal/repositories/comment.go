@@ -2,7 +2,7 @@ package repositories
 
 import (
 	"context"
-	"subscription-report/models"
+	"subscription-report/internal/models"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )

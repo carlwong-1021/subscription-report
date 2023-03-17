@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
-	"subscription-report/models"
-	"subscription-report/services"
+	"subscription-report/internal/models"
+	"subscription-report/internal/services"
 )
 
 type _queryOrderDetailStep struct {

@@ -1,8 +1,8 @@
 package steps
 
 import (
-	"subscription-report/repositories"
-	"subscription-report/services"
+	"subscription-report/internal/repositories"
+	"subscription-report/internal/services"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
