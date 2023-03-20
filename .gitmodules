@@ -1,0 +1,3 @@
+[submodule "developer-protos"]
+	path = developer-protos
+	url = git@bitbucket.org:starlinglabs/developer-protos.git

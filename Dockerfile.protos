@@ -1,0 +1,23 @@
+FROM golang:1.20.1-alpine3.16 AS final
+
+WORKDIR /
+
+# Update and upgrade repo
+RUN apk update
+RUN apk add unzip bash make
+
+ADD https://github.com/google/protobuf/releases/download/v22.2/protoc-22.2-linux-x86_64.zip ./
+RUN unzip protoc-22.2-linux-x86_64.zip -d ./usr/local && \
+    rm protoc-22.2-linux-x86_64.zip
+
+ENV PATH $PATH:/usr/local/go/bin
+ENV GOBIN /usr/local/go/bin
+
+RUN go install github.com/golang/protobuf/protoc-gen-go@latest
+RUN go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+
+COPY Makefile ./
+COPY developer-protos ./src
+
+CMD ["make", "generate_pb"]
+
