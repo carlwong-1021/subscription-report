@@ -3,13 +3,12 @@ package internal
 import (
 	"flag"
 	"log"
-	"net/http"
 
 	"github.com/joho/godotenv"
 
-	"subscription-report/internal/services"
-
-	_ "github.com/go-sql-driver/mysql"
+	developer_api "subscription-report/internal/developer-api"
+	"subscription-report/internal/steps"
+	"subscription-report/internal/subscription_report"
 )
 
 func Exec() {
@@ -23,12 +22,15 @@ func Exec() {
 	flag.StringVar(&toRange, "e", "", "to range")
 	flag.Parse()
 
-	httpClient := &http.Client{}
-	options := &services.ReportOption{
+	developerApiClient := developer_api.NewDeveloperApiClient()
+
+	options := &subscription_report.ReportOption{
 		From: fromRange,
 		To:   toRange,
 	}
-	reportService := services.NewReportService(options)
+	reportService := subscription_report.NewReportService(options)
 
-	reportService.Exec()
+	fetchAppSubscriptionStep := steps.NewFetchAppSubscriptionStep(developerApiClient)
+
+	reportService.Exec(fetchAppSubscriptionStep)
 }

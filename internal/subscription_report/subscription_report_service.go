@@ -1,11 +1,12 @@
 package subscription_report
 
+import (
+	services_interfaces "subscription-report/interfaces/services"
+	steps_interfaces "subscription-report/interfaces/steps"
+)
+
 type _reportService struct {
 	options *ReportOption
-}
-
-type ReportService interface {
-	Exec()
 }
 
 type ReportOption struct {
@@ -13,12 +14,12 @@ type ReportOption struct {
 	To   string
 }
 
-func NewReportService(options *ReportOption) ReportService {
+func NewReportService(options *ReportOption) services_interfaces.ReportService {
 	return &_reportService{
 		options: options,
 	}
 }
 
-func (r *_reportService) Exec() {
+func (r *_reportService) Exec(fetchAppSubscriptionStep steps_interfaces.FetchAppSubscriptionStep) {
 
 }

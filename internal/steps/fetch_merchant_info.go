@@ -1,30 +1,66 @@
 package steps
 
 import (
-	"subscription-report/internal/repositories"
+	"encoding/json"
+	"fmt"
+	"io/ioutil"
+	"net/http"
+	"strings"
+	"subscription-report/internal/models"
 	"subscription-report/internal/services"
-	"time"
-
-	"go.mongodb.org/mongo-driver/bson"
 )
 
-type _queryLatestChangeStep struct {
-	repo repositories.CommentRepository
+type _queryOrderDetailStep struct {
+	url    string
+	client *http.Client
 }
 
-func NewQueryLatestChangeStep(repo repositories.CommentRepository) services.Step {
-	return &_queryLatestChangeStep{repo: repo}
+func NewQueryOrderDetailStep(url string, client *http.Client) services.Step {
+	return &_queryOrderDetailStep{url: url, client: client}
 }
 
-func (q *_queryLatestChangeStep) Exec(input any, option *services.ReportOption) (any, *services.ReportOption) {
-	layout := "2006-01-02"
-	from, _ := time.Parse(layout, option.From)
-	to, _ := time.Parse(layout, option.To)
-
-	filter := bson.M{"date": bson.M{"$gte": from, "$lte": to}}
-	comments, err := q.repo.GetComments(filter)
-	if err != nil {
-		panic(err)
+func (q _queryOrderDetailStep) Exec(input any, option *services.ReportOption) (any, *services.ReportOption) {
+	comments, isComments := input.([]models.Comment)
+	if !isComments {
+		panic("wrong input type")
 	}
-	return comments, option
+	ids := make([]string, 0)
+	for _, comment := range comments {
+		ids = append(ids, comment.MovieId.Hex())
+	}
+
+	var result []map[string]any
+
+	for start, end := 0, 0; start <= len(ids)-1; start = end {
+		end = start + option.BatchSize
+		if end > len(ids) {
+			end = len(ids)
+		}
+		batch := ids[start:end]
+		response, err := q.fetchData(batch)
+		if err != nil {
+			fmt.Println("fetch api error: ", err)
+			break
+		}
+		result = append(result, response...)
+	}
+
+	return result, option
+}
+
+func (q _queryOrderDetailStep) fetchData(ids []string) ([]map[string]any, error) {
+	var response []map[string]any
+	res, err := http.Get(q.url + "?ids=" + strings.Join(ids, ","))
+	if err != nil {
+		return nil, err
+	}
+
+	body, err := ioutil.ReadAll(res.Body)
+	err = json.Unmarshal(body, &response)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	return response, nil
 }
