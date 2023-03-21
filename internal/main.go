@@ -9,6 +9,7 @@ import (
 	developer_api "subscription-report/internal/developer-api"
 	"subscription-report/internal/steps"
 	"subscription-report/internal/subscription_report"
+	options_subscription_report "subscription-report/internal/subscription_report/options"
 )
 
 func Exec() {
@@ -24,7 +25,7 @@ func Exec() {
 
 	developerApiClient := developer_api.NewDeveloperApiClient()
 
-	options := &subscription_report.ReportOption{
+	options := &options_subscription_report.ReportOption{
 		From: fromRange,
 		To:   toRange,
 	}

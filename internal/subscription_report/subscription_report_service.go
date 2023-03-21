@@ -3,23 +3,24 @@ package subscription_report
 import (
 	services_interfaces "subscription-report/interfaces/services"
 	steps_interfaces "subscription-report/interfaces/steps"
+	options_subscription_report "subscription-report/internal/subscription_report/options"
+	"time"
+
+	"golang.org/x/net/context"
 )
 
 type _reportService struct {
-	options *ReportOption
+	options *options_subscription_report.ReportOption
 }
 
-type ReportOption struct {
-	From string
-	To   string
-}
-
-func NewReportService(options *ReportOption) services_interfaces.ReportService {
+func NewReportService(options *options_subscription_report.ReportOption) services_interfaces.ReportService {
 	return &_reportService{
 		options: options,
 	}
 }
 
 func (r *_reportService) Exec(fetchAppSubscriptionStep steps_interfaces.FetchAppSubscriptionStep) {
-
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	fetchAppSubscriptionStep.Exec(ctx, r.options)
 }

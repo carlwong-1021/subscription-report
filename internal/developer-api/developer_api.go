@@ -1,6 +1,8 @@
 package developer_api
 
 import (
+	"context"
+	services_interfaces "subscription-report/interfaces/services"
 	"subscription-report/plugins/grpc_client"
 	"time"
 
@@ -15,7 +17,11 @@ const (
 	retryBaseInterval = 100 * time.Millisecond
 )
 
-func NewDeveloperApiClient() pb.ApplicationsClient {
+type _developerApiClient struct {
+	conn *grpc.ClientConn
+}
+
+func NewDeveloperApiClient() services_interfaces.DeveloperApiClient {
 	opts := []grpc_retry.CallOption{
 		grpc_retry.WithBackoff(grpc_retry.BackoffExponential(retryBaseInterval)),
 		grpc_retry.WithMax(uint(maxRetry)),
@@ -23,5 +29,18 @@ func NewDeveloperApiClient() pb.ApplicationsClient {
 	conn := grpc_client.NewGrpcClientConnection("DEVELOPER_API_ENDPOINT", "DEVELOPER_API_SSL", "DEVELOPER_API_DIAL_TIMEOUT", []grpc.UnaryClientInterceptor{
 		grpc_retry.UnaryClientInterceptor(opts...),
 	})
-	return pb.NewApplicationsClient(conn)
+	return &_developerApiClient{
+		conn: conn,
+	}
+}
+
+func (s *_developerApiClient) GetApplications(ctx context.Context) ([]*pb.Application, error) {
+	client := pb.NewApplicationsClient(s.conn)
+	req := &pb.AppIndexRequest{}
+	resp, err := client.Index(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+	items := resp.GetItems()
+	return items, nil
 }
