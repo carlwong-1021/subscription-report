@@ -3,6 +3,7 @@ package subscription_report
 import (
 	services_interfaces "subscription-report/interfaces/services"
 	steps_interfaces "subscription-report/interfaces/steps"
+	"subscription-report/internal/entities"
 	options_subscription_report "subscription-report/internal/subscription_report/options"
 	"time"
 
@@ -22,5 +23,7 @@ func NewReportService(options *options_subscription_report.ReportOption) service
 func (r *_reportService) Exec(fetchAppSubscriptionStep steps_interfaces.FetchAppSubscriptionStep) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	fetchAppSubscriptionStep.Exec(ctx, r.options)
+
+	reports := []*entities.SubscriptionReport{}
+	reports = fetchAppSubscriptionStep.Exec(ctx, reports, r.options)
 }

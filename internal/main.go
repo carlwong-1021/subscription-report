@@ -3,6 +3,7 @@ package internal
 import (
 	"flag"
 	"log"
+	"time"
 
 	"github.com/joho/godotenv"
 
@@ -22,12 +23,15 @@ func Exec() {
 	flag.StringVar(&fromRange, "s", "", "from range")
 	flag.StringVar(&toRange, "e", "", "to range")
 	flag.Parse()
+	layout := "2006-01-02"
+	from, _ := time.Parse(layout, fromRange)
+	to, _ := time.Parse(layout, toRange)
 
 	developerApiClient := developer_api.NewDeveloperApiClient()
 
 	options := &options_subscription_report.ReportOption{
-		From: fromRange,
-		To:   toRange,
+		From: from,
+		To:   to,
 	}
 	reportService := subscription_report.NewReportService(options)
 

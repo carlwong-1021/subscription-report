@@ -1,6 +1,8 @@
 package options_subscription_report
 
+import "time"
+
 type ReportOption struct {
-	From string
-	To   string
+	From time.Time
+	To   time.Time
 }

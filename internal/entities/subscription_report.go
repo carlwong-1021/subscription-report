@@ -3,7 +3,7 @@ package entities
 import "time"
 
 type SubscriptionReport struct {
-	SubscriptionDate     time.Time
+	SubscriptionDate     *time.Time
 	SubscriptionSource   string
 	AppName              string
 	AppPrice             string
@@ -13,8 +13,8 @@ type SubscriptionReport struct {
 	ShopName             string
 	ShopURL              string
 	SubscriptionCycle    string
-	SubscriptionFee      uint64
-	OneOffActivationFee  uint64
+	SubscriptionFee      *float64
+	OneOffActivationFee  *float64
 	SubscriptionCurrency string
 	BillNumber           string
 	OrderId              string
@@ -23,10 +23,10 @@ type SubscriptionReport struct {
 	TaxID                string
 	CompanyAddress       string
 	InvoiceReceiptEmail  string
-	DeveloperRevenue     float64
-	RebateAccountDate    time.Time
-	RebateRatio          float64
-	RebateAmount         float64
-	RebatePaymentDate    time.Time
-	InvoiceIssueDate     time.Time
+	DeveloperRevenue     *float64
+	RebateAccountDate    *time.Time
+	RebateRatio          *float64
+	RebateAmount         *float64
+	RebatePaymentDate    *time.Time
+	InvoiceIssueDate     *time.Time
 }
