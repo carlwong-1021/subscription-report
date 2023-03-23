@@ -7,5 +7,5 @@ import (
 )
 
 type FetchAppSubscriptionStep interface {
-	Exec(ctx context.Context, reports []*entities.SubscriptionReport, option *options_subscription_report.ReportOption) []*entities.SubscriptionReport
+	Exec(ctx context.Context, option *options_subscription_report.ReportOption) ([]*entities.SubscriptionReport, error)
 }

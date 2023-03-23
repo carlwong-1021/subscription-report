@@ -34,10 +34,10 @@ func NewDeveloperApiClient() services_interfaces.DeveloperApiClient {
 	}
 }
 
-func (s *_developerApiClient) GetApplications(ctx context.Context) ([]*pb.Application, error) {
-	client := pb.NewApplicationsClient(s.conn)
-	req := &pb.AppIndexRequest{}
-	resp, err := client.Index(ctx, req)
+func (s *_developerApiClient) GetSubscriptions(ctx context.Context, req *pb.ListSubscriptionReportsRequest) ([]*pb.SubscriptionReport, error) {
+	client := pb.NewApplicationSubscriptionsClient(s.conn)
+
+	resp, err := client.ListSubscriptionReports(ctx, req)
 	if err != nil {
 		return nil, err
 	}

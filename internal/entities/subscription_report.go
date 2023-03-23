@@ -3,6 +3,7 @@ package entities
 import "time"
 
 type SubscriptionReport struct {
+	ApplicationId        string
 	SubscriptionDate     *time.Time
 	SubscriptionSource   string
 	AppName              string

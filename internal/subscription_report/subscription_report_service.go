@@ -1,9 +1,9 @@
 package subscription_report
 
 import (
+	"fmt"
 	services_interfaces "subscription-report/interfaces/services"
 	steps_interfaces "subscription-report/interfaces/steps"
-	"subscription-report/internal/entities"
 	options_subscription_report "subscription-report/internal/subscription_report/options"
 	"time"
 
@@ -24,6 +24,12 @@ func (r *_reportService) Exec(fetchAppSubscriptionStep steps_interfaces.FetchApp
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	reports := []*entities.SubscriptionReport{}
-	reports = fetchAppSubscriptionStep.Exec(ctx, reports, r.options)
+	reports, err := fetchAppSubscriptionStep.Exec(ctx, r.options)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	for _, report := range reports {
+		fmt.Println(*report)
+	}
 }

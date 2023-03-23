@@ -21,11 +21,12 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ApplicationSubscriptions_Index_FullMethodName          = "/DeveloperApi.ApplicationSubscriptions/Index"
-	ApplicationSubscriptions_Show_FullMethodName           = "/DeveloperApi.ApplicationSubscriptions/Show"
-	ApplicationSubscriptions_Create_FullMethodName         = "/DeveloperApi.ApplicationSubscriptions/Create"
-	ApplicationSubscriptions_Update_FullMethodName         = "/DeveloperApi.ApplicationSubscriptions/Update"
-	ApplicationSubscriptions_TerminateTrial_FullMethodName = "/DeveloperApi.ApplicationSubscriptions/TerminateTrial"
+	ApplicationSubscriptions_Index_FullMethodName                   = "/DeveloperApi.ApplicationSubscriptions/Index"
+	ApplicationSubscriptions_Show_FullMethodName                    = "/DeveloperApi.ApplicationSubscriptions/Show"
+	ApplicationSubscriptions_Create_FullMethodName                  = "/DeveloperApi.ApplicationSubscriptions/Create"
+	ApplicationSubscriptions_Update_FullMethodName                  = "/DeveloperApi.ApplicationSubscriptions/Update"
+	ApplicationSubscriptions_TerminateTrial_FullMethodName          = "/DeveloperApi.ApplicationSubscriptions/TerminateTrial"
+	ApplicationSubscriptions_ListSubscriptionReports_FullMethodName = "/DeveloperApi.ApplicationSubscriptions/ListSubscriptionReports"
 )
 
 // ApplicationSubscriptionsClient is the client API for ApplicationSubscriptions service.
@@ -37,6 +38,7 @@ type ApplicationSubscriptionsClient interface {
 	Create(ctx context.Context, in *ApplicationSubscriptionCreateRequest, opts ...grpc.CallOption) (*ApplicationSubscription, error)
 	Update(ctx context.Context, in *ApplicationSubscriptionCreateRequest, opts ...grpc.CallOption) (*ApplicationSubscription, error)
 	TerminateTrial(ctx context.Context, in *TerminateTrialRequest, opts ...grpc.CallOption) (*ApplicationSubscriptionEmptyReply, error)
+	ListSubscriptionReports(ctx context.Context, in *ListSubscriptionReportsRequest, opts ...grpc.CallOption) (*ListSubscriptionReportsReply, error)
 }
 
 type applicationSubscriptionsClient struct {
@@ -92,6 +94,15 @@ func (c *applicationSubscriptionsClient) TerminateTrial(ctx context.Context, in 
 	return out, nil
 }
 
+func (c *applicationSubscriptionsClient) ListSubscriptionReports(ctx context.Context, in *ListSubscriptionReportsRequest, opts ...grpc.CallOption) (*ListSubscriptionReportsReply, error) {
+	out := new(ListSubscriptionReportsReply)
+	err := c.cc.Invoke(ctx, ApplicationSubscriptions_ListSubscriptionReports_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ApplicationSubscriptionsServer is the server API for ApplicationSubscriptions service.
 // All implementations must embed UnimplementedApplicationSubscriptionsServer
 // for forward compatibility
@@ -101,6 +112,7 @@ type ApplicationSubscriptionsServer interface {
 	Create(context.Context, *ApplicationSubscriptionCreateRequest) (*ApplicationSubscription, error)
 	Update(context.Context, *ApplicationSubscriptionCreateRequest) (*ApplicationSubscription, error)
 	TerminateTrial(context.Context, *TerminateTrialRequest) (*ApplicationSubscriptionEmptyReply, error)
+	ListSubscriptionReports(context.Context, *ListSubscriptionReportsRequest) (*ListSubscriptionReportsReply, error)
 	mustEmbedUnimplementedApplicationSubscriptionsServer()
 }
 
@@ -122,6 +134,9 @@ func (UnimplementedApplicationSubscriptionsServer) Update(context.Context, *Appl
 }
 func (UnimplementedApplicationSubscriptionsServer) TerminateTrial(context.Context, *TerminateTrialRequest) (*ApplicationSubscriptionEmptyReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TerminateTrial not implemented")
+}
+func (UnimplementedApplicationSubscriptionsServer) ListSubscriptionReports(context.Context, *ListSubscriptionReportsRequest) (*ListSubscriptionReportsReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListSubscriptionReports not implemented")
 }
 func (UnimplementedApplicationSubscriptionsServer) mustEmbedUnimplementedApplicationSubscriptionsServer() {
 }
@@ -227,6 +242,24 @@ func _ApplicationSubscriptions_TerminateTrial_Handler(srv interface{}, ctx conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ApplicationSubscriptions_ListSubscriptionReports_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListSubscriptionReportsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ApplicationSubscriptionsServer).ListSubscriptionReports(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ApplicationSubscriptions_ListSubscriptionReports_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ApplicationSubscriptionsServer).ListSubscriptionReports(ctx, req.(*ListSubscriptionReportsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ApplicationSubscriptions_ServiceDesc is the grpc.ServiceDesc for ApplicationSubscriptions service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -253,6 +286,10 @@ var ApplicationSubscriptions_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "TerminateTrial",
 			Handler:    _ApplicationSubscriptions_TerminateTrial_Handler,
+		},
+		{
+			MethodName: "ListSubscriptionReports",
+			Handler:    _ApplicationSubscriptions_ListSubscriptionReports_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

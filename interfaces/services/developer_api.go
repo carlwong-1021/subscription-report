@@ -6,5 +6,5 @@ import (
 )
 
 type DeveloperApiClient interface {
-	GetApplications(ctx context.Context) ([]*pb.Application, error)
+	GetSubscriptions(ctx context.Context, req *pb.ListSubscriptionReportsRequest) ([]*pb.SubscriptionReport, error)
 }
