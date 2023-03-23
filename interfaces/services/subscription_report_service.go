@@ -5,5 +5,5 @@ import (
 )
 
 type ReportService interface {
-	Exec(steps_interfaces.FetchAppSubscriptionStep, steps_interfaces.GenerateReportStep)
+	Exec(steps_interfaces.FetchAppSubscriptionStep, steps_interfaces.FetchMerchantInfoStep, steps_interfaces.GenerateReportStep)
 }

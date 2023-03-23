@@ -1,56 +1,69 @@
 package steps
 
-// type _queryOrderDetailStep struct {
-// 	url    string
-// 	client *http.Client
-// }
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	steps_interfaces "subscription-report/interfaces/steps"
+	"subscription-report/internal/entities"
+	options_subscription_report "subscription-report/internal/subscription_report/options"
+)
 
-// func NewQueryOrderDetailStep(url string, client *http.Client) services.Step {
-// 	return &_queryOrderDetailStep{url: url, client: client}
-// }
+type _queryOrderDetailStep struct {
+	client      *http.Client
+	mbsEndpoint string
+}
 
-// func (q _queryOrderDetailStep) Exec(input any, option *services.ReportOption) (any, *services.ReportOption) {
-// 	comments, isComments := input.([]models.Comment)
-// 	if !isComments {
-// 		panic("wrong input type")
-// 	}
-// 	ids := make([]string, 0)
-// 	for _, comment := range comments {
-// 		ids = append(ids, comment.MovieId.Hex())
-// 	}
+type MerchantInfoRes struct {
+	Data MerchantInfo `json:"data"`
+}
 
-// 	var result []map[string]any
+type MerchantInfo struct {
+	Handle  string `json:"handle"`
+	Name    string `json:"name"`
+	ShopURL string `json:"brand_home_url"`
+	// InvoiceType         string `json:"handle"`
+	// CompanyName         string `json:"handle"`
+	// TaxID               string `json:"handle"`
+	// CompanyAddress      string `json:"handle"`
+	// InvoiceReceiptEmail string `json:"handle"`
+}
 
-// 	for start, end := 0, 0; start <= len(ids)-1; start = end {
-// 		end = start + option.BatchSize
-// 		if end > len(ids) {
-// 			end = len(ids)
-// 		}
-// 		batch := ids[start:end]
-// 		response, err := q.fetchData(batch)
-// 		if err != nil {
-// 			fmt.Println("fetch api error: ", err)
-// 			break
-// 		}
-// 		result = append(result, response...)
-// 	}
+func NewFetchMerchantInfoStep(client *http.Client, mbsEndpoint string) steps_interfaces.FetchMerchantInfoStep {
+	return &_queryOrderDetailStep{client: client, mbsEndpoint: mbsEndpoint}
+}
 
-// 	return result, option
-// }
+func (s *_queryOrderDetailStep) Exec(ctx context.Context, reports []*entities.SubscriptionReport, opts *options_subscription_report.ReportOption) ([]*entities.SubscriptionReport, error) {
+	for _, report := range reports {
+		info, err := s.getMerchantInfo(report.MerchantID)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		report.Handle = info.Handle
+		report.ShopName = info.Name
+		report.ShopURL = info.ShopURL
+	}
+	return reports, nil
+}
 
-// func (q _queryOrderDetailStep) fetchData(ids []string) ([]map[string]any, error) {
-// 	var response []map[string]any
-// 	res, err := http.Get(q.url + "?ids=" + strings.Join(ids, ","))
-// 	if err != nil {
-// 		return nil, err
-// 	}
+func (s *_queryOrderDetailStep) getMerchantInfo(id string) (MerchantInfo, error) {
+	info := MerchantInfo{}
+	response, err := http.Get(s.mbsEndpoint + "/v1/" + id)
+	if err != nil {
+		return info, err
+	}
 
-// 	body, err := ioutil.ReadAll(res.Body)
-// 	err = json.Unmarshal(body, &response)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	defer res.Body.Close()
+	body, _ := io.ReadAll(response.Body)
+	defer response.Body.Close()
 
-// 	return response, nil
-// }
+	err = json.Unmarshal(body, &info)
+	if err != nil {
+		return info, err
+	}
+
+	fmt.Println(info)
+	return info, nil
+}

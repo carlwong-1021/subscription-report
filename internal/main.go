@@ -3,6 +3,8 @@ package internal
 import (
 	"flag"
 	"log"
+	"net/http"
+	"os"
 	"time"
 
 	"github.com/joho/godotenv"
@@ -27,6 +29,7 @@ func Exec() {
 	from, _ := time.Parse(layout, fromRange)
 	to, _ := time.Parse(layout, toRange)
 
+	httpClient := &http.Client{}
 	developerApiClient := developer_api.NewDeveloperApiClient()
 
 	options := &options_subscription_report.ReportOption{
@@ -36,7 +39,8 @@ func Exec() {
 	reportService := subscription_report.NewReportService(options)
 
 	fetchAppSubscriptionStep := steps.NewFetchAppSubscriptionStep(developerApiClient)
+	fetchMerchantInfoStep := steps.NewFetchMerchantInfoStep(httpClient, os.Getenv("MBS_API_ENDPOINT"))
 	generateReportStep := steps.NewGenrateReportStep()
 
-	reportService.Exec(fetchAppSubscriptionStep, generateReportStep)
+	reportService.Exec(fetchAppSubscriptionStep, fetchMerchantInfoStep, generateReportStep)
 }

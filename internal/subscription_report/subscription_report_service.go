@@ -20,7 +20,7 @@ func NewReportService(options *options_subscription_report.ReportOption) service
 	}
 }
 
-func (s *_reportService) Exec(fetchAppSubscriptionStep steps_interfaces.FetchAppSubscriptionStep, generateReportStep steps_interfaces.GenerateReportStep) {
+func (s *_reportService) Exec(fetchAppSubscriptionStep steps_interfaces.FetchAppSubscriptionStep, fetchMerchantInfoStep steps_interfaces.FetchMerchantInfoStep, generateReportStep steps_interfaces.GenerateReportStep) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -29,8 +29,11 @@ func (s *_reportService) Exec(fetchAppSubscriptionStep steps_interfaces.FetchApp
 		fmt.Println(err)
 		return
 	}
+
+	fetchMerchantInfoStep.Exec(ctx, reports, s.options)
 	for _, report := range reports {
 		fmt.Println(*report)
 	}
+
 	generateReportStep.Exec(reports, s.options)
 }
