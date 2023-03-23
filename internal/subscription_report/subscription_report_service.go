@@ -20,11 +20,11 @@ func NewReportService(options *options_subscription_report.ReportOption) service
 	}
 }
 
-func (r *_reportService) Exec(fetchAppSubscriptionStep steps_interfaces.FetchAppSubscriptionStep) {
+func (s *_reportService) Exec(fetchAppSubscriptionStep steps_interfaces.FetchAppSubscriptionStep, generateReportStep steps_interfaces.GenerateReportStep) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	reports, err := fetchAppSubscriptionStep.Exec(ctx, r.options)
+	reports, err := fetchAppSubscriptionStep.Exec(ctx, s.options)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -32,4 +32,5 @@ func (r *_reportService) Exec(fetchAppSubscriptionStep steps_interfaces.FetchApp
 	for _, report := range reports {
 		fmt.Println(*report)
 	}
+	generateReportStep.Exec(reports, s.options)
 }

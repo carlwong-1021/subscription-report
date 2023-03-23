@@ -36,6 +36,7 @@ func Exec() {
 	reportService := subscription_report.NewReportService(options)
 
 	fetchAppSubscriptionStep := steps.NewFetchAppSubscriptionStep(developerApiClient)
+	generateReportStep := steps.NewGenrateReportStep()
 
-	reportService.Exec(fetchAppSubscriptionStep)
+	reportService.Exec(fetchAppSubscriptionStep, generateReportStep)
 }
