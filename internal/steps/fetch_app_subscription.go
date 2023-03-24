@@ -48,7 +48,7 @@ func reportResToEntity(reports []*pb.SubscriptionReport) []*entities.Subscriptio
 			ApplicationId:      report.ApplicationId,
 			SubscriptionSource: report.PurchaseType,
 			AppName:            report.ApplicationName,
-			CompanyName:        report.BusinessName,
+			AppDeveloper:       report.BusinessName,
 			AppPrice:           getAppPrice(report.IsFree),
 			SubscriptionDate:   &subDate,
 		})
