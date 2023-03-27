@@ -12,8 +12,25 @@ import (
 )
 
 type _queryOrderDetailStep struct {
-	client      *http.Client
-	mbsEndpoint string
+	client       *http.Client
+	msEndpoint   string
+	mainEndpoint string
+}
+
+type InvoiceSettingRes struct {
+	Data InvoiceSetting `json:"data"`
+}
+
+type InvoiceSetting struct {
+	InvoiceAttribute InvoiceAttribute `json:"attributes"`
+}
+
+type InvoiceAttribute struct {
+	InvoiceType         string `json:"drawee"`
+	CompanyName         string `json:"company_name"`
+	TaxID               string `json:"company_unified_id"`
+	CompanyAddress      string `json:"company_registered_address"`
+	InvoiceReceiptEmail string `json:"email"`
 }
 
 type MerchantInfoRes struct {
@@ -24,15 +41,10 @@ type MerchantInfo struct {
 	Handle  string `json:"handle"`
 	Name    string `json:"name"`
 	ShopURL string `json:"brand_home_url"`
-	// InvoiceType         string `json:"handle"`
-	// CompanyName         string `json:"handle"`
-	// TaxID               string `json:"handle"`
-	// CompanyAddress      string `json:"handle"`
-	// InvoiceReceiptEmail string `json:"handle"`
 }
 
-func NewFetchMerchantInfoStep(client *http.Client, mbsEndpoint string) steps_interfaces.FetchMerchantInfoStep {
-	return &_queryOrderDetailStep{client: client, mbsEndpoint: mbsEndpoint}
+func NewFetchMerchantInfoStep(client *http.Client, msEndpoint string, mainEndpoint string) steps_interfaces.FetchMerchantInfoStep {
+	return &_queryOrderDetailStep{client: client, msEndpoint: msEndpoint, mainEndpoint: mainEndpoint}
 }
 
 func (s *_queryOrderDetailStep) Exec(ctx context.Context, reports []*entities.SubscriptionReport, opts *options_subscription_report.ReportOption) ([]*entities.SubscriptionReport, error) {
@@ -42,28 +54,51 @@ func (s *_queryOrderDetailStep) Exec(ctx context.Context, reports []*entities.Su
 			fmt.Println(err)
 			continue
 		}
+		invoice, err := s.getInvoiceSetting(report.MerchantID)
 		report.Handle = info.Handle
 		report.ShopName = info.Name
 		report.ShopURL = info.ShopURL
+		report.InvoiceType = invoice.InvoiceType
+		report.CompanyName = invoice.CompanyName
+		report.TaxID = invoice.TaxID
+		report.CompanyAddress = invoice.CompanyAddress
+		report.InvoiceReceiptEmail = invoice.InvoiceReceiptEmail
 	}
 	return reports, nil
 }
 
-func (s *_queryOrderDetailStep) getMerchantInfo(id string) (MerchantInfo, error) {
-	info := MerchantInfo{}
-	response, err := http.Get(s.mbsEndpoint + "/v1/" + id)
+func (s *_queryOrderDetailStep) getInvoiceSetting(id string) (*InvoiceAttribute, error) {
+	result := &InvoiceSettingRes{}
+	response, err := http.Get(s.msEndpoint + "/api/merchants/" + id + "/invoice")
 	if err != nil {
-		return info, err
+		return nil, err
 	}
 
 	body, _ := io.ReadAll(response.Body)
 	defer response.Body.Close()
 
-	err = json.Unmarshal(body, &info)
+	err = json.Unmarshal(body, result)
 	if err != nil {
-		return info, err
+		return nil, err
 	}
 
-	fmt.Println(info)
-	return info, nil
+	return &result.Data.InvoiceAttribute, nil
+}
+
+func (s *_queryOrderDetailStep) getMerchantInfo(id string) (*MerchantInfo, error) {
+	result := &MerchantInfoRes{}
+	response, err := http.Get(s.mainEndpoint + "/v1/" + id)
+	if err != nil {
+		return nil, err
+	}
+
+	body, _ := io.ReadAll(response.Body)
+	defer response.Body.Close()
+
+	err = json.Unmarshal(body, &result)
+	if err != nil {
+		return nil, err
+	}
+
+	return &result.Data, nil
 }

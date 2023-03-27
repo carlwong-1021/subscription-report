@@ -39,7 +39,7 @@ func Exec() {
 	reportService := subscription_report.NewReportService(options)
 
 	fetchAppSubscriptionStep := steps.NewFetchAppSubscriptionStep(developerApiClient)
-	fetchMerchantInfoStep := steps.NewFetchMerchantInfoStep(httpClient, os.Getenv("MBS_API_ENDPOINT"))
+	fetchMerchantInfoStep := steps.NewFetchMerchantInfoStep(httpClient, os.Getenv("MERCHANT_SERVICE_API_ENDPOINT"), os.Getenv("MAIN_API_ENDPOINT"))
 	generateReportStep := steps.NewGenrateReportStep()
 
 	reportService.Exec(fetchAppSubscriptionStep, fetchMerchantInfoStep, generateReportStep)
