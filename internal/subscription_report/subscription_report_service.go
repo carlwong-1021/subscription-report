@@ -31,9 +31,5 @@ func (s *_reportService) Exec(fetchAppSubscriptionStep steps_interfaces.FetchApp
 	}
 
 	fetchMerchantInfoStep.Exec(ctx, reports, s.options)
-	for _, report := range reports {
-		fmt.Println(*report)
-	}
-
 	generateReportStep.Exec(reports, s.options)
 }

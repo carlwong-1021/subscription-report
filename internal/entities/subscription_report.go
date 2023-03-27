@@ -24,10 +24,4 @@ type SubscriptionReport struct {
 	TaxID                string
 	CompanyAddress       string
 	InvoiceReceiptEmail  string
-	DeveloperRevenue     *float64
-	RebateAccountDate    *time.Time
-	RebateRatio          *float64
-	RebateAmount         *float64
-	RebatePaymentDate    *time.Time
-	InvoiceIssueDate     *time.Time
 }

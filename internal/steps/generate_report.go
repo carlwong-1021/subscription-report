@@ -47,11 +47,13 @@ func (s *_genrateReportStep) Exec(reports []*entities.SubscriptionReport, option
 
 	for i, report := range reports {
 		for j, definition := range constants.FieldDefinitions {
-			f.SetCellValue("Sheet1", getColumnAlph(j+1)+strconv.Itoa(i+3), definition.GetValue(report))
+			if err := f.SetCellValue("Sheet1", getColumnAlph(j+1)+strconv.Itoa(i+3), definition.GetValue(report)); err != nil {
+				fmt.Println("Error when set cell value: ", err)
+			}
 		}
 	}
 
 	if err := f.SaveAs("demo.xlsx"); err != nil {
-		fmt.Println(err)
+		fmt.Println("Error when save excel file: ", err)
 	}
 }
