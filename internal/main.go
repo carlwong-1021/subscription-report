@@ -25,7 +25,7 @@ func Exec() {
 	flag.StringVar(&fromRange, "s", "", "from range")
 	flag.StringVar(&toRange, "e", "", "to range")
 	flag.Parse()
-	layout := "2006-01-02"
+	layout := "02-01-2006"
 	from, _ := time.Parse(layout, fromRange)
 	to, _ := time.Parse(layout, toRange)
 
